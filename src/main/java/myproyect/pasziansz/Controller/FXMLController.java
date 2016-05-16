@@ -27,8 +27,8 @@ import myproyect.pasziansz.Model.Pakli;
 public class FXMLController implements Initializable {
     
     private Pakli pakli;
-    
-    
+    private Kartya draggedKartya;
+    private ImageView draggedImageView;
     
   /*  
     @FXML
@@ -79,6 +79,8 @@ public class FXMLController implements Initializable {
     private AnchorPane oszlop6View;
     @FXML
     private AnchorPane oszlop7View;
+    @FXML
+    private AnchorPane root;
     
     private AnchorPane[] osszOszlop;
     
@@ -97,8 +99,6 @@ public class FXMLController implements Initializable {
         
         pakli = new Pakli();
         pakliView.setImage(pakli.getHatlap());
-        
-        randomKartyaView.setImage(kartyaHuzas().getFace());
         
         halom1View.setImage(pakli.getHatlap());
         halom2View.setImage(pakli.getHatlap());
@@ -119,7 +119,16 @@ public class FXMLController implements Initializable {
                 seged.setStackNumber(i);
         }
         
+        randomKartyaView.setImage(kartyaHuzas().getFace());
         
+        
+        setupRandomKartyaListener(randomKartyaView);
+        
+        root.setOnDragOver((event)->{
+            System.out.println("DragOver");
+            draggedImageView.setLayoutX(event.getSceneX());
+            draggedImageView.setLayoutY(event.getSceneY());
+        });
         
         
         
@@ -187,6 +196,18 @@ public class FXMLController implements Initializable {
                     osszOszlop[i].getChildren().add(Image);
                 });
         
+    }
+    
+    private void setupRandomKartyaListener(ImageView image){
+        image.setOnDragDetected((event)->{
+            draggedImageView = image;
+            draggedKartya = pakli.getKartyak().stream()
+                           .filter(x-> x.getFace().equals(image.getImage()))
+                           .findAny()
+                           .get();
+            System.out.println("dragDetected: "+draggedKartya.getPlaceID()+" helyen "+draggedKartya.getStackNumber()+".");
+                   
+        });
     }
     
 }
