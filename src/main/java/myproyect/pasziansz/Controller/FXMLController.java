@@ -143,7 +143,7 @@ public class FXMLController implements Initializable {
         
         pakli.setCurrentRandom(r);
         Kartya seged = pakli.getKartyak().get(pakli.getCurrentRandom());
-        
+        seged.setPlaceID(2);
         
         return pakli.getKartyak().get(r); 
     }
