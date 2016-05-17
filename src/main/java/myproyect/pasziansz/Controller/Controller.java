@@ -24,7 +24,7 @@ import static jdk.nashorn.internal.objects.NativeRegExp.source;
 import myproyect.pasziansz.Model.Kartya;
 import myproyect.pasziansz.Model.Pakli;
 
-public class FXMLController implements Initializable {
+public class Controller implements Initializable {
     
     private Pakli pakli;
     private Kartya draggedKartya;
