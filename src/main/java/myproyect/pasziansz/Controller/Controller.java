@@ -1,26 +1,20 @@
 package myproyect.pasziansz.Controller;
 
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.ResourceBundle;
 import java.util.stream.Collectors;
-import javafx.collections.ObservableList;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
-import javafx.print.Collation;
-import javafx.scene.control.TextField;
-import javafx.scene.image.Image;
+import javafx.scene.effect.BlendMode;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.AnchorPane;
-import static jdk.nashorn.internal.objects.NativeRegExp.source;
 import myproyect.pasziansz.Model.Kartya;
 import myproyect.pasziansz.Model.Pakli;
 
@@ -29,6 +23,7 @@ public class Controller implements Initializable {
     private Pakli pakli;
     private Kartya draggedKartya;
     private ImageView draggedImageView;
+    private int prevDragged;
     
   /*  
     @FXML
@@ -49,7 +44,10 @@ public class Controller implements Initializable {
     
     @FXML
     private void randomAction(MouseEvent event) {
-        randomKartyaView.setImage( kartyaHuzas().getFace());
+        Kartya seged = randomKarty();
+        randomKartyaView.setImage( seged.getFace());
+        seged.setPlaceID(2);
+        seged.setStackNumber(1);
     }
     
     
@@ -79,14 +77,12 @@ public class Controller implements Initializable {
     private AnchorPane oszlop6View;
     @FXML
     private AnchorPane oszlop7View;
-    @FXML
-    private AnchorPane root;
     
     private AnchorPane[] osszOszlop;
     
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-                
+        
         osszOszlop = new AnchorPane[7];
         osszOszlop[0] = oszlop1View;
         osszOszlop[1] = oszlop2View;
@@ -118,17 +114,16 @@ public class Controller implements Initializable {
                 seged.setPlaceID(i+7);
                 seged.setStackNumber(i);
         }
-        
-        randomKartyaView.setImage(kartyaHuzas().getFace());
+        seged = kartyaHuzas();
+        seged.setPlaceID(2);
+        seged.setStackNumber(1);
+        randomKartyaView.setImage(seged.getFace());
         
         
         setupRandomKartyaListener(randomKartyaView);
-        
-        root.setOnDragOver((event)->{
-            System.out.println("DragOver");
-            draggedImageView.setLayoutX(event.getSceneX());
-            draggedImageView.setLayoutY(event.getSceneY());
-        });
+        for (int i = 0; i < 7; i++) {
+            setupOszlopListener(osszOszlop[i], i);
+        }
         
         
         
@@ -171,7 +166,9 @@ public class Controller implements Initializable {
     }
     
     private void refreshView(){
+        
         for (int i = 0;i<7;i++){
+            osszOszlop[i].getChildren().clear();
             drawWithStream(i);
         }
         
@@ -184,30 +181,86 @@ public class Controller implements Initializable {
         lista.forEach(item -> {
                     ImageView Image;
                     
-                    if (item.isVisible())
+                    if (item.isVisible()){
                         Image = new ImageView(item.getFace());
+                        setupRandomKartyaListener(Image);
+                    }
                     else 
                         Image = new ImageView(pakli.getHatlap());
                     
                     Image.setFitWidth(125);
                     Image.setPreserveRatio(true);
-                    Image.setLayoutY(30*item.getStackNumber());
-                    Image.setLayoutX(0);
+                    Image.setLayoutY(30*item.getStackNumber()+2);
+                    Image.setLayoutX(2);
                     osszOszlop[i].getChildren().add(Image);
                 });
         
     }
+    
     
     private void setupRandomKartyaListener(ImageView image){
         image.setOnDragDetected((event)->{
             draggedImageView = image;
             draggedKartya = pakli.getKartyak().stream()
                            .filter(x-> x.getFace().equals(image.getImage()))
-                           .findAny()
+                           .findFirst()
                            .get();
+            prevDragged = draggedKartya.getPlaceID();
             System.out.println("dragDetected: "+draggedKartya.getPlaceID()+" helyen "+draggedKartya.getStackNumber()+".");
+            
+            Dragboard dragBoard = image.startDragAndDrop(TransferMode.MOVE);
+
+                ClipboardContent content = new ClipboardContent();
+
+                content.putImage(image.getImage());
+
+                dragBoard.setContent(content);
                    
         });
+        image.setOnDragDone((event)->{
+            if (prevDragged == 2)
+            {
+                Kartya seged = randomKarty();
+                randomKartyaView.setImage( seged.getFace());
+                seged.setPlaceID(2);
+                seged.setStackNumber(1);
+            }
+            System.out.println("Done "+draggedKartya.getPlaceID());
+            event.consume();
+        
+        });
+    }
+    private void setupOszlopListener(AnchorPane oszlop, int i){
+        oszlop.setOnDragEntered((event)->{
+            oszlop.setBlendMode(BlendMode.BLUE);
+        });
+        oszlop.setOnDragExited((event)->{
+            oszlop.setBlendMode(null);
+            
+            event.consume();
+            
+        });
+        oszlop.setOnDragOver((event)->{
+            event.acceptTransferModes(TransferMode.COPY_OR_MOVE);
+            
+            event.consume();
+        });
+        oszlop.setOnDragDropped((event)->{
+            Dragboard db = event.getDragboard();
+            draggedKartya.setPlaceID(i+7);
+            int stackNumber = (int)pakli.getKartyak().stream()
+                    .filter(w->w.getPlaceID().equals(i+7))
+                    .count();
+            draggedKartya.setStackNumber(stackNumber);
+            draggedKartya.setVisible(true);
+            event.setDropCompleted(true);
+            System.out.println("dropped place:"+(i+7)+" stack"+stackNumber);
+            refreshView();
+            
+            event.consume();
+            
+        });
+        
     }
     
 }
