@@ -133,7 +133,9 @@ public class Controller implements Initializable {
     
     private Kartya randomKarty(){
         if(pakli.getCurrentRandom() >=0){
-            pakli.getKartyak().get(pakli.getCurrentRandom()).setVisible(false);
+            Kartya seged = pakli.getKartyak().get(pakli.getCurrentRandom()) ;
+            seged.setVisible(false);
+            seged.setPlaceID(1);
         }
         
         boolean valid = true;
@@ -148,6 +150,7 @@ public class Controller implements Initializable {
         pakli.setCurrentRandom(r);
         Kartya seged = pakli.getKartyak().get(pakli.getCurrentRandom());
         seged.setPlaceID(2);
+        seged.setVisible(true);
         
         return pakli.getKartyak().get(r); 
     }
@@ -169,6 +172,7 @@ public class Controller implements Initializable {
         
         for (int i = 0;i<7;i++){
             osszOszlop[i].getChildren().clear();
+            visszaRendezes(i);
             drawWithStream(i);
         }
         
@@ -220,7 +224,7 @@ public class Controller implements Initializable {
         image.setOnDragDone((event)->{
             if (prevDragged == 2)
             {
-                Kartya seged = randomKarty();
+                Kartya seged = kartyaHuzas();
                 randomKartyaView.setImage( seged.getFace());
                 seged.setPlaceID(2);
                 seged.setStackNumber(1);
@@ -261,6 +265,16 @@ public class Controller implements Initializable {
             
         });
         
+    }
+    
+    private void visszaRendezes(int i){
+         List<Kartya> lista= pakli.getKartyak().stream()
+                .filter(w -> w.getPlaceID().equals(i+7))
+                .sorted((a1, a2) -> Integer.compare(a1.getStackNumber(), a2.getStackNumber()))
+                .collect(Collectors.toList());
+         for (int j = 0; j< lista.size();j++){
+             lista.get(j).setStackNumber(j);
+         }
     }
     
 }
