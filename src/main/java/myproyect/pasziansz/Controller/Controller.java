@@ -172,7 +172,7 @@ public class Controller implements Initializable {
         do{
             
             r = new Random().nextInt(51);
-            if (pakli.getKartyak().get(r).getPlaceID() == 1)
+            if (pakli.getKartyak().get(r).getPlaceID().equals(1))
                 valid = false;
         }while ( valid);
         
@@ -183,7 +183,7 @@ public class Controller implements Initializable {
         
         for (int i = 0;i<7;i++){
             osszOszlop[i].getChildren().clear();
-            visszaRendezes(i);
+            visszaRendezesOszlop(i);
             drawWithStream(i);
             if (i<4){
                 drawHalom(i);
@@ -254,7 +254,7 @@ public class Controller implements Initializable {
                    
         });
         image.setOnDragDone((event)->{
-            if (prevDragged == 2)
+            if (prevDragged == 2 && allowDrop)
             {
                 Kartya seged = kartyaHuzas();
                 randomKartyaView.setImage( seged.getFace());
@@ -268,36 +268,36 @@ public class Controller implements Initializable {
     }
     private void setupOszlopListener(AnchorPane oszlop, int i){
         oszlop.setOnDragEntered((event)->{
-        try{    
-            Optional<Kartya> a = pakli.getKartyak().stream()
-                    .filter(w -> w.getPlaceID().equals(i+7))
-                    .max((a1,a2)-> a1.getStackNumber().compareTo(a2.getStackNumber()));
-            allowDrop = false;
-            
-            if(a.get().getNumValue()> draggedKartya.getNumValue())
-                switch(a.get().getType()){
-                    case "diamonds":
-                            if(draggedKartya.getType().equals("clubs") || draggedKartya.getType().equals("spades"))
-                                allowDrop = true;
-                        break;
-                    case "hearts":
-                            if(draggedKartya.getType().equals("clubs") || draggedKartya.getType().equals("spades"))
-                                allowDrop = true;
-                        break;
-                    case "clubs":
-                            if(draggedKartya.getType().equals("diamonds") || draggedKartya.getType().equals("hearts"))
-                                allowDrop = true;
-                        break;
-                    case "spades":
-                            if(draggedKartya.getType().equals("diamonds") || draggedKartya.getType().equals("hearts"))
-                                allowDrop = true;
-                        break;
-                }
-            if(!a.get().isVisible())
+            try{    
+                Optional<Kartya> a = pakli.getKartyak().stream()
+                        .filter(w -> w.getPlaceID().equals(i+7))
+                        .max((a1,a2)-> a1.getStackNumber().compareTo(a2.getStackNumber()));
+                allowDrop = false;
+
+                if(a.get().getNumValue().equals(draggedKartya.getNumValue()+1))
+                    switch(a.get().getType()){
+                        case "diamonds":
+                                if(draggedKartya.getType().equals("clubs") || draggedKartya.getType().equals("spades"))
+                                    allowDrop = true;
+                            break;
+                        case "hearts":
+                                if(draggedKartya.getType().equals("clubs") || draggedKartya.getType().equals("spades"))
+                                    allowDrop = true;
+                            break;
+                        case "clubs":
+                                if(draggedKartya.getType().equals("diamonds") || draggedKartya.getType().equals("hearts"))
+                                    allowDrop = true;
+                            break;
+                        case "spades":
+                                if(draggedKartya.getType().equals("diamonds") || draggedKartya.getType().equals("hearts"))
+                                    allowDrop = true;
+                            break;
+                    }
+                if(!a.get().isVisible())
+                    allowDrop = true;
+            }catch(Exception e){
                 allowDrop = true;
-        }catch(Exception e){
-            allowDrop = true;
-        }
+            }
             
             if (allowDrop)            
                 oszlop.setBlendMode(BlendMode.BLUE);
@@ -306,34 +306,37 @@ public class Controller implements Initializable {
         oszlop.setOnDragExited((event)->{
             oszlop.setBlendMode(null);
             
-            event.consume();
             
         });
         oszlop.setOnDragOver((event)->{
             if (allowDrop)
-            event.acceptTransferModes(TransferMode.COPY_OR_MOVE);
+            event.acceptTransferModes(TransferMode.MOVE);
             
-            event.consume();
         });
         oszlop.setOnDragDropped((event)->{
             Dragboard db = event.getDragboard();
+            db.clear();
             draggedKartya.setPlaceID(i+7);
-            int stackNumber = (int)pakli.getKartyak().stream()
-                    .filter(w->w.getPlaceID().equals(i+7))
-                    .count();
+            int stackNumber;
+            try{
+                stackNumber = (int)pakli.getKartyak().stream()
+                        .filter(w->w.getPlaceID().equals(i+7))
+                        .count();
+            }catch(Exception e){
+                stackNumber = 0;
+            }
             draggedKartya.setStackNumber(stackNumber);
             draggedKartya.setVisible(true);
             event.setDropCompleted(true);
             System.out.println("dropped place:"+(i+7)+" stack"+stackNumber);
             refreshView();
             
-            event.consume();
             
         });
         
     }
     
-    private void visszaRendezes(int i){
+    private void visszaRendezesOszlop(int i){
         try{
             List<Kartya> lista= pakli.getKartyak().stream()
                    .filter(w -> w.getPlaceID().equals(i+7))
@@ -359,7 +362,7 @@ public class Controller implements Initializable {
             
         });
         halom.setOnDragOver((event)->{
-            event.acceptTransferModes(TransferMode.COPY_OR_MOVE);
+            event.acceptTransferModes(TransferMode.MOVE);
             
             event.consume();
         });
@@ -367,9 +370,14 @@ public class Controller implements Initializable {
             Dragboard db = event.getDragboard();
             db.clear();
             draggedKartya.setPlaceID(i+3);
-             int stackNumber = (int)pakli.getKartyak().stream()
-                    .filter(w->w.getPlaceID().equals(i+7))
-                    .count();
+            int stackNumber;
+            try{
+                stackNumber = (int)pakli.getKartyak().stream()
+                        .filter(w->w.getPlaceID().equals(i+3))
+                        .count();
+            }catch(Exception e){
+                stackNumber = 0;
+            }
             draggedKartya.setStackNumber(stackNumber);
             draggedKartya.setVisible(true);
             event.setDropCompleted(true);
