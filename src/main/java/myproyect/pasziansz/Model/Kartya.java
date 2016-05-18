@@ -17,6 +17,7 @@ public class Kartya {
     private Image face;
     private boolean visible;
     private String value, type;
+    private Integer numValue;
     
     
     public Kartya(String Name){
@@ -29,6 +30,27 @@ public class Kartya {
         this.placeID = 1;
 
         this.stackNumber = 1;
+        
+        try{
+            this.numValue = Integer.parseInt(value);
+        }catch(Exception e){
+            switch(value){
+                case "ace": 
+                        this.numValue = 1;
+                    break;
+                case "jack": 
+                        this.numValue = 11;
+                    break;
+                case "king": 
+                        this.numValue = 13;
+                    break;
+                case "queen": 
+                        this.numValue = 12;
+                    break;
+                    
+            }
+        }
+            
     }
     public Kartya(Kartya k){
         this.visible = k.isVisible();
@@ -48,6 +70,9 @@ public class Kartya {
 
     public Integer getStackNumber() {
         return stackNumber;
+    }
+    public Integer getNumValue() {
+        return numValue;
     }
 
     public Image getFace() {
