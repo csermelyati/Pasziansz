@@ -93,8 +93,9 @@ public class Controller implements Initializable {
         halom2View.setImage(pakli.getHatlap());
         halom3View.setImage(pakli.getHatlap());
         halom4View.setImage(pakli.getHatlap());
-        
-        this.athelyezKartya(this.randomKartyIndex(), 2);
+        try{
+            this.athelyezKartya(this.randomKartyIndex(), 2);
+        }catch(Exception e){}
         
         //Listenerek beállítása
         kartyaListeners(randomKartyaView);
@@ -236,7 +237,7 @@ public class Controller implements Initializable {
      * kiválaszt egy kártyát ami még a pakliban van
      * @return a kiválasztott kártya indexe
      */
-    private int randomKartyIndex(){
+    private int randomKartyIndex() throws Exception{
         List<Kartya> maradek = pakli.getKartyak().stream()
                 .filter(w->w.getPlaceID().equals(1))
                 .collect(Collectors.toList());
@@ -269,9 +270,13 @@ public class Controller implements Initializable {
                    
         });
         image.setOnDragDone((event)->{
-            if(pakli.getKartyak().stream().filter(w->w.getPlaceID().equals(2)).count() == 0)
+            if(pakli.getKartyak().stream().filter(w->w.getPlaceID().equals(2)).count() == 0){
+                try{
                 this.athelyezKartya(this.randomKartyIndex(), 2);
-            
+                }catch(Exception e){
+                    
+                }
+            }
             
             event.consume();
             refreshView();
