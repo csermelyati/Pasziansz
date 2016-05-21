@@ -12,7 +12,7 @@ import javafx.scene.image.Image;
  * @author csermely
  */
 public class Kartya {
-    
+    private int index;
     private Integer placeID, stackNumber;
     private Image face;
     private boolean visible;
@@ -20,7 +20,8 @@ public class Kartya {
     private Integer numValue;
     
     
-    public Kartya(String Name){
+    public Kartya(String Name, int i){
+        this.index = i-1;
         this.visible = false;
         this.face = new Image(Kartya.class.getResourceAsStream("/Cards/"+Name+".png"));
         String[] details = Name.split("_");
@@ -29,7 +30,7 @@ public class Kartya {
         
         this.placeID = 1;
 
-        this.stackNumber = 1;
+        this.stackNumber = 0;
         
         try{
             this.numValue = Integer.parseInt(value);
@@ -66,6 +67,10 @@ public class Kartya {
 
     public Integer getPlaceID() {
         return placeID;
+    }
+    
+    public int getIndex(){
+        return this.index;
     }
 
     public Integer getStackNumber() {

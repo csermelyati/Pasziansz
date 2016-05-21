@@ -1,6 +1,7 @@
 package myproyect.pasziansz.Controller;
 
 import java.net.URL;
+import java.util.Collections;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
@@ -20,31 +21,10 @@ import myproyect.pasziansz.Model.Kartya;
 import myproyect.pasziansz.Model.Pakli;
 
 public class Controller implements Initializable {
+
+    Pakli pakli; // a modell
     
-    private Pakli pakli;
-    private Kartya draggedKartya;
-    private int prevDragged;
-    
-  /*  
-    @FXML
-    private void handleButtonAction(ActionEvent event) {
-        String ID = field.getText();
-        Image kep = pakli.getKartyak().get(Integer.parseInt(ID)).getFace();
-        ImageView image;
-        image = new ImageView(kep);
-        image.setFitWidth(150);
-        image.setPreserveRatio(true);
-        image.setLayoutX(x+=10);
-        image.setLayoutY(y);
-        setupDragDropListener(image);
-        anchorpane.getChildren().add(image);
-        
-    }
-    */
-    
-    
-    
-    
+    // A View-ban található elemek leképezése-----------------------------------
     @FXML
     private ImageView pakliView;
     @FXML
@@ -72,27 +52,26 @@ public class Controller implements Initializable {
     @FXML
     private AnchorPane oszlop7View;
     
+    //--------------------------------------------------------------------------
+    
+    //a View elemeit csoportosító tömbök, a könnyebb kezelhetőség érdekében-----
     private AnchorPane[] osszOszlop;
     private ImageView[] osszHalom;
+    //--------------------------------------------------------------------------
     
-    private boolean allowDrop;
+    private int draggedIngex;
     
-    @FXML
-    private void randomAction(MouseEvent event) {
-        if(pakli.getCurrentRandom() >=0){
-            Kartya seged = pakli.getKartyak().get(pakli.getCurrentRandom()) ;
-            seged.setVisible(false);
-            seged.setPlaceID(1);
-        }
-        Kartya seged = randomKarty();
-        randomKartyaView.setImage( seged.getFace());
-        refreshView();
-        
-    }
     
+    /**
+     * Itt kerül inicializálásra a játék.
+     * Létre jön a pakli objektum, mely a modell szerepéül szolgál.
+     * Továbbá a View elemeihez itt hozom létre a Listenereket.
+     */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        
+        //Modell inicializálása
+        pakli = new Pakli();
+        //a tábla oszlop referenciáinak inicializálása az erre alkalmas tömbben
         osszOszlop = new AnchorPane[7];
         osszOszlop[0] = oszlop1View;
         osszOszlop[1] = oszlop2View;
@@ -101,14 +80,13 @@ public class Controller implements Initializable {
         osszOszlop[4] = oszlop5View;
         osszOszlop[5] = oszlop6View;
         osszOszlop[6] = oszlop7View;
-        
+        //a tábla halom referenciáinak inicializálása az erre alkalmas tömbben
         osszHalom = new ImageView[4];
         osszHalom[0] = halom1View;
         osszHalom[1] = halom2View;
         osszHalom[2] = halom3View;
         osszHalom[3] = halom4View;
         
-        pakli = new Pakli();
         pakliView.setImage(pakli.getHatlap());
         
         halom1View.setImage(pakli.getHatlap());
@@ -116,101 +94,241 @@ public class Controller implements Initializable {
         halom3View.setImage(pakli.getHatlap());
         halom4View.setImage(pakli.getHatlap());
         
-        Kartya seged;
+        this.athelyezKartya(this.randomKartyIndex(), 2);
+        
+        //Listenerek beállítása
+        kartyaListeners(randomKartyaView);
         for(int i = 0;i<7;i++){
-            for(int j = 0;j<i;j++){
-                seged = kartyaHuzas();
-                seged.setVisible(false);
-                seged.setPlaceID(i+7);
-                seged.setStackNumber(j);
-            }
-            seged = kartyaHuzas();
-                seged.setVisible(true);
-                seged.setPlaceID(i+7);
-                seged.setStackNumber(i);
+            oszlopListeners(osszOszlop[i], i);
+            if(i<4){}
         }
-        seged = randomKarty();
-        
-        
-        
-        setupRandomKartyaListener(randomKartyaView);
-        for (int i = 0; i < 7; i++) {
-            setupOszlopListener(osszOszlop[i], i);
-            if (i<4){
-                setupHalomListener(osszHalom[i], i);
-            }
-        }
-        
-        
-        
-        refreshView();
-    }
-    
-    
-    private Kartya randomKarty(){
-        
-        
-        boolean valid = true;
-        int r;
-        do{
-            
-            r = new Random().nextInt(51);
-            if (pakli.getKartyak().get(r).getPlaceID() == 1)
-                valid = false;
-        }while ( valid);
-        
-        pakli.setCurrentRandom(r);
-        Kartya seged = pakli.getKartyak().get(pakli.getCurrentRandom());
-        seged.setPlaceID(2);
-        seged.setPlaceID(1);
-        seged.setVisible(true);
-        
-        return pakli.getKartyak().get(r); 
-    }
-    
-    private Kartya kartyaHuzas(){
-        boolean valid = true;
-        int r;
-        do{
-            
-            r = new Random().nextInt(51);
-            if (pakli.getKartyak().get(r).getPlaceID().equals(1))
-                valid = false;
-        }while ( valid);
-        return pakli.getKartyak().get(r);
-    }
-    
-    private void refreshView(){
-        
-        for (int i = 0;i<7;i++){
-            osszOszlop[i].getChildren().clear();
-            visszaRendezesOszlop(i);
-            drawWithStream(i);
-            if(i<4)
-                drawHalom(i);
-            randomKartyaView.setImage(pakli.getKartyak().get(pakli.getCurrentRandom()).getFace());
-            
-        }
+        pakliView.setOnMouseClicked(event->{
+            this.csereKratya();
+            refreshView();
+        });
         
     }
-    
-    private void drawHalom(int i){
+    /**
+     * Eldönti, hogy a kiválasztott kártyát át lehet e helyezni a kívánt helyre
+     * 
+     * 
+     * @param index a kártya indexe a pakliban
+     * @param hely a cél helyét jelölő index
+     * @return jelzi, hogy az áthelyezés sikeres volt e
+     */
+    private boolean athelyezHitelesites(int index, int hely){
+        Kartya akt = pakli.getKartyak().get(index);
         try{
-            Optional<Kartya> a = pakli.getKartyak().stream()
-                    .filter(w -> w.getPlaceID().equals(i+3))
-                    .max((a1,a2)-> a1.getStackNumber().compareTo(a2.getStackNumber()));
-            Kartya item = a.get();
-            ImageView Image = new ImageView(item.getFace());
-            Image.setFitWidth(125);
-            Image.setPreserveRatio(true);
-            Image.setLayoutY(30*item.getStackNumber()+2);
-            Image.setLayoutX(2);
-            osszHalom[i].setImage(Image.getImage());
-        }catch(NoSuchElementException e){}
-                    
-                
+            Kartya celMax = pakli.getKartyak().stream()
+                    .filter(w->w.getPlaceID().equals(hely))
+                    .max((a1,a2)->a1.getStackNumber().compareTo(a2.getStackNumber())).get();
+            
+            //ha oszlop
+            if(hely > 6){
+                boolean allowDrop = false;
+                if(celMax.getNumValue().equals(akt.getNumValue()+1))
+                    switch(celMax.getType()){
+                        case "diamonds":
+                                if(akt.getType().equals("clubs") || akt.getType().equals("spades"))
+                                    allowDrop = true;
+                            break;
+                        case "hearts":
+                                if(akt.getType().equals("clubs") || akt.getType().equals("spades"))
+                                    allowDrop = true;
+                            break;
+                        case "clubs":
+                                if(akt.getType().equals("diamonds") || akt.getType().equals("hearts"))
+                                    allowDrop = true;
+                            break;
+                        case "spades":
+                                if(akt.getType().equals("diamonds") || akt.getType().equals("hearts"))
+                                    allowDrop = true;
+                            break;
+                    }
+              return allowDrop;
+            }
+            //ha halom
+            else if (hely > 2){
+                return celMax.getNumValue().equals(akt.getNumValue()+1) && celMax.getType().equals(akt.getType());
+            }
+            else return true;
+        }catch(Exception e){
+            if(hely > 6){
+                return true;
+            }
+            else if(hely >2){
+                return akt.getValue().equals("king");
+            }
+            else return true;
+        }
     }
-    private void drawWithStream(int i){
+    
+    
+    /**
+     * Ezzel a metódussal át tudunk helyezni egy kártyát egy másik helyre (oszlop, halom...)
+     * 
+     * 
+     * @param index a kártya indexe a pakliban
+     * @param hely a cél helyét jelölő index
+     * @return jelzi, hogy az áthelyezés sikeres volt e
+     */
+    private boolean athelyezKartya(int index, int hely){
+        try{
+            Kartya akt = pakli.getKartyak().get(index);
+            int stackNum;
+            try{
+                if(hely>2)
+                    stackNum = pakli.getKartyak().stream()
+                            .filter(w->w.getPlaceID().equals(hely))
+                            .max((a1,a2)->a1.getStackNumber().compareTo(a2.getStackNumber())).get().getStackNumber()+1;
+                else stackNum = 0;
+            }catch(Exception e){
+                stackNum = 0;
+
+            }
+            akt.setPlaceID(hely);
+            akt.setStackNumber(stackNum);
+            if(hely == 1){
+                akt.setVisible(false);
+            }
+            else akt.setVisible(true);
+            
+            return true;
+        }
+        catch(Exception e){
+            return false;
+        }
+    }
+    
+    /**
+     * Ha a felhasználó nem tud mit kezdeni a pakliból húzott lappal,
+     * akkor ez a függvény intézi el, hogy az a lap vissza kerüljön a pakliba,
+     * és egy másik kerüljön a helyére.
+     * 
+     * @return az 
+     */
+    private boolean csereKratya(){
+        try{
+            Kartya akt = pakli.getKartyak().stream()
+                    .filter(w->w.getPlaceID().equals(2))
+                    .findFirst().get();
+            akt.setPlaceID(1);
+            akt.setStackNumber(0);
+            akt.setVisible(false);
+        }catch(Exception e){}
+        
+        try{
+            athelyezKartya(this.randomKartyIndex(), 2);
+            return true;
+        }catch(Exception e){
+            return false;
+        }
+    }
+    
+    /**
+     * kiválaszt egy kártyát ami még a pakliban van
+     * @return a kiválasztott kártya indexe
+     */
+    private int randomKartyIndex(){
+        List<Kartya> maradek = pakli.getKartyak().stream()
+                .filter(w->w.getPlaceID().equals(1))
+                .collect(Collectors.toList());
+        Random r = new Random();
+        int i;
+        do{
+            i = r.nextInt(maradek.size());
+        }while (!maradek.get(i).getPlaceID().equals(1));
+        
+        return maradek.get(i).getIndex();
+    }
+    
+    private void kartyaListeners(ImageView image)
+    {
+        image.setOnDragDetected((event)->{
+            draggedIngex = pakli.getKartyak().stream()
+                           .filter(x-> x.getFace().equals(image.getImage()))
+                           .findFirst()
+                           .get().getIndex();
+            
+                Dragboard dragBoard = image.startDragAndDrop(TransferMode.MOVE);
+
+                ClipboardContent content = new ClipboardContent();
+
+                content.putImage(image.getImage());
+
+                dragBoard.setContent(content);
+                
+                event.consume();
+                   
+        });
+        image.setOnDragDone((event)->{
+            if(pakli.getKartyak().stream().filter(w->w.getPlaceID().equals(2)).count() == 0)
+                this.athelyezKartya(this.randomKartyIndex(), 2);
+            
+            
+            event.consume();
+            refreshView();
+        });
+    }
+    private void oszlopListeners(AnchorPane oszlop, int i){
+        oszlop.setOnDragEntered((event)->{
+            if (this.athelyezHitelesites(draggedIngex, i+7))            
+                oszlop.setBlendMode(BlendMode.BLUE);
+            else oszlop.setBlendMode(BlendMode.GREEN);
+            event.consume();
+        });
+        oszlop.setOnDragExited((event)->{
+            oszlop.setBlendMode(null);
+            
+            event.consume();
+        });
+        oszlop.setOnDragOver((event)->{
+            if (oszlop.getBlendMode().equals(BlendMode.BLUE))
+            event.acceptTransferModes(TransferMode.MOVE);
+            event.consume();
+        });
+        oszlop.setOnDragDropped((event)->{
+            Dragboard db = event.getDragboard();
+            db.clear();
+            
+            if(oszlop.getBlendMode().equals(BlendMode.BLUE)){
+                List<Kartya> indexek = pakli.getKartyak().stream()
+                        .filter(w->w.getPlaceID().equals(pakli.getKartyak().get(draggedIngex).getPlaceID()) && (w.getStackNumber()>=pakli.getKartyak().get(draggedIngex).getStackNumber()))
+                        .sorted((a1,a2)-> a1.getStackNumber().compareTo(a2.getStackNumber()))
+                        .collect(Collectors.toList());
+                
+                indexek.forEach(item->{
+                    this.athelyezKartya(item.getIndex(), i+7);
+                });
+                
+                
+            }
+            
+            event.setDropCompleted(true);
+            
+            event.consume();
+        });
+        
+    }
+    private void refreshView(){
+        //oszlopok frissítése
+        for(int i=0;i<7;i++){
+            osszOszlop[i].getChildren().clear();
+            drawOszlop(i);
+            if(i<4){
+                drawHalom(i);
+            }
+            try {
+                randomKartyaView.setImage(pakli.getKartyak().stream().filter(w->w.getPlaceID().equals(2)).findFirst().get().getFace());
+            } catch (Exception e) {
+                System.out.println("myproyect.pasziansz.Controller.Controller2.refreshView() -.-.-.-.-.-.-.-.-.");
+            }
+                
+         
+        }
+        
+    }
+    private void drawOszlop(int i){
         try{
             List<Kartya> lista= pakli.getKartyak().stream()
                     .filter(w -> w.getPlaceID().equals(i+7))
@@ -221,7 +339,7 @@ public class Controller implements Initializable {
 
                         if (item.isVisible()){
                             Image = new ImageView(item.getFace());
-                            setupRandomKartyaListener(Image);
+                            kartyaListeners(Image);
                         }
                         else 
                             Image = new ImageView(pakli.getHatlap());
@@ -232,190 +350,21 @@ public class Controller implements Initializable {
                         Image.setLayoutX(2);
                         osszOszlop[i].getChildren().add(Image);
                     });
-        }catch(NoSuchElementException e){}
-        
-    }
-    
-    
-    private void setupRandomKartyaListener(ImageView image){
-        image.setOnDragDetected((event)->{
-            draggedKartya = pakli.getKartyak().stream()
-                           .filter(x-> x.getFace().equals(image.getImage()))
-                           .findFirst()
-                           .get();
-            prevDragged = draggedKartya.getPlaceID();
-            System.out.println("dragDetected: "+draggedKartya.getPlaceID()+" helyen "+draggedKartya.getStackNumber()+".");
-            
-            Dragboard dragBoard = image.startDragAndDrop(TransferMode.MOVE);
-
-                ClipboardContent content = new ClipboardContent();
-
-                content.putImage(image.getImage());
-
-                dragBoard.setContent(content);
-                   
-        });
-        image.setOnDragDone((event)->{
-            randomKarty();
-            refreshView();
-            System.out.println("Done "+draggedKartya.getPlaceID());
-            event.consume();
-        
-        });
-    }
-    private void setupOszlopListener(AnchorPane oszlop, int i){
-        oszlop.setOnDragEntered((event)->{
-            try{    
-                Optional<Kartya> a = pakli.getKartyak().stream()
-                        .filter(w -> w.getPlaceID().equals(i+7))
-                        .max((a1,a2)-> a1.getStackNumber().compareTo(a2.getStackNumber()));
-                allowDrop = false;
-
-                if(a.get().getNumValue().equals(draggedKartya.getNumValue()+1))
-                    switch(a.get().getType()){
-                        case "diamonds":
-                                if(draggedKartya.getType().equals("clubs") || draggedKartya.getType().equals("spades"))
-                                    allowDrop = true;
-                            break;
-                        case "hearts":
-                                if(draggedKartya.getType().equals("clubs") || draggedKartya.getType().equals("spades"))
-                                    allowDrop = true;
-                            break;
-                        case "clubs":
-                                if(draggedKartya.getType().equals("diamonds") || draggedKartya.getType().equals("hearts"))
-                                    allowDrop = true;
-                            break;
-                        case "spades":
-                                if(draggedKartya.getType().equals("diamonds") || draggedKartya.getType().equals("hearts"))
-                                    allowDrop = true;
-                            break;
-                    }
-                if(!a.get().isVisible())
-                    allowDrop = true;
-            }catch(NoSuchElementException e){
-                allowDrop = true;
-            }
-            
-            if (allowDrop)            
-                oszlop.setBlendMode(BlendMode.BLUE);
-            else oszlop.setBlendMode(BlendMode.GREEN);
-        });
-        oszlop.setOnDragExited((event)->{
-            oszlop.setBlendMode(null);
-            
-            
-        });
-        oszlop.setOnDragOver((event)->{
-            if (allowDrop)
-            event.acceptTransferModes(TransferMode.MOVE);
-            
-        });
-        oszlop.setOnDragDropped((event)->{
-            Dragboard db = event.getDragboard();
-            db.clear();
-            
-            int stackNumber;
-            try{
-                stackNumber = (int)pakli.getKartyak().stream()
-                        .filter(w->w.getPlaceID().equals(i+7))
-                        .count();
-            }catch(NoSuchElementException e){
-                stackNumber = 0;
-            }
-           
-            if (draggedKartya.getPlaceID() > 2){
-                 List<Kartya> athelyez = pakli.getKartyak().stream()
-                        .filter(w-> (w.getPlaceID().equals(draggedKartya.getPlaceID()) && (w.getStackNumber() >= draggedKartya.getStackNumber())))
-                        .collect(Collectors.toList());
-                
-                for(Kartya a : athelyez){
-                    a.setPlaceID(i+7);
-                    a.setStackNumber(stackNumber);
-                    stackNumber = stackNumber + 1;
-                    a.setVisible(true);
-                }
-            }
-            else{
-                draggedKartya.setPlaceID(i+7);
-                draggedKartya.setStackNumber(stackNumber);
-                draggedKartya.setVisible(true);
-            }
-            
-            event.setDropCompleted(true);
-            System.out.println("dropped place:"+(i+7)+" stack"+stackNumber);
-            refreshView();
-            System.out.println("dropped: "+draggedKartya.getPlaceID());
-            
-        });
-        
-    }
-    
-    
-    private void setupHalomListener(ImageView halom, int i){
-        halom.setOnDragEntered((event)->{
-            allowDrop = false;
-            try{
-                Integer max = pakli.getKartyak().stream()
-                            .filter(w -> w.getPlaceID().equals(draggedKartya.getPlaceID()))
-                            .max((a1,a2)->a1.getStackNumber().compareTo(a2.getStackNumber())).get().getStackNumber();
-                Kartya halomTop = pakli.getKartyak().stream()
-                            .filter(w->w.getPlaceID().equals(i+3))
-                            .max((a1,a2) -> a1.getStackNumber().compareTo(a2.getStackNumber())).get();
-                if(draggedKartya.getType().equals(halomTop.getType()) && draggedKartya.getStackNumber().equals(max) && (draggedKartya.getNumValue() < halomTop.getNumValue()))
-                    allowDrop = true;
-            }catch(NoSuchElementException e){
-                allowDrop = true;
-            }
-            
-            if (allowDrop)            
-                halom.setBlendMode(BlendMode.BLUE);
-            else halom.setBlendMode(BlendMode.GREEN);
-            
-        });
-        halom.setOnDragExited((event)->{
-            halom.setBlendMode(null);
-            
-        });
-        halom.setOnDragOver((event)->{
-            event.acceptTransferModes(TransferMode.MOVE);
-            
-        });
-        halom.setOnDragDropped((event)->{
-            if(allowDrop){
-                Dragboard db = event.getDragboard();
-                db.clear();
-                draggedKartya.setPlaceID(i+3);
-                int stackNumber;
-                try{
-                    stackNumber = (int)pakli.getKartyak().stream()
-                            .filter(w->w.getPlaceID().equals(i+3))
-                            .count();
-                }catch(NoSuchElementException e){
-                    stackNumber = 0;
-                }
-                draggedKartya.setStackNumber(stackNumber);
-                draggedKartya.setVisible(true);
-                event.setDropCompleted(true);
-                System.out.println("dropped place:"+(i+3)+" stack"+stackNumber);
-            }
-            refreshView();
-            
-        });
-    }
-    private void visszaRendezesOszlop(int i){
-        try{
-            
-            List<Kartya> lista= pakli.getKartyak().stream()
-                   .filter(w -> w.getPlaceID().equals(i+7))
-                   .sorted((a1, a2) -> Integer.compare(a1.getStackNumber(), a2.getStackNumber()))
-                   .collect(Collectors.toList());
-            int j;
-            for (j = 0; j< lista.size();j++){
-                lista.get(j).setStackNumber(j);
-            }
-            lista.get(lista.size()-1).setVisible(true);
         }catch(Exception e){}
-         
     }
-    
+    private void drawHalom(int i){
+        try{
+            Kartya item = pakli.getKartyak().stream()
+                    .filter(w -> w.getPlaceID().equals(i+3))
+                    .max((a1,a2)-> a1.getStackNumber().compareTo(a2.getStackNumber())).get();
+            ImageView Image = new ImageView(item.getFace());
+            Image.setFitWidth(125);
+            Image.setPreserveRatio(true);
+            Image.setLayoutY(30*item.getStackNumber()+2);
+            Image.setLayoutX(2);
+            osszHalom[i].setImage(Image.getImage());
+        }catch(Exception e){}
+                    
+                
+    }
 }

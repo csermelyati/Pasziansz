@@ -28,7 +28,7 @@ public class Pakli {
         ResourceBundle nevek = ResourceBundle.getBundle("Cards.Cards");
         for(int i = 1; i<=51;i++){
             String name = nevek.getString(i+"");
-            Kartya k = new Kartya(name);
+            Kartya k = new Kartya(name,i);
             kartyak.add(k);
         }
         currentRandom = -1;

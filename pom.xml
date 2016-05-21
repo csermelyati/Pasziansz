@@ -14,11 +14,27 @@
         <mainClass>myproyect.pasziansz.MainApp</mainClass>
     </properties>
 
-    <organization>
-        <!-- Used as the 'Vendor' for JNLP generation -->
-        <name>Your Organisation</name>
-    </organization>
-
+    <developers>
+        <developer>
+            <id>csermelyati</id>
+            <name>Csermely Attila</name>
+            <email>csermelyati@gmail.com</email>
+            <roles>
+                <role>backend developer</role>
+                <role>frontend developer</role>
+                <role>team leader</role>
+            </roles>
+        </developer>
+    </developers>
+    
+    <dependencies>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.12</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
     <build>
         <plugins>
             <plugin>

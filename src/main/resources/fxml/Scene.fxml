@@ -7,9 +7,9 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<AnchorPane id="AnchorPane" fx:id="root" prefHeight="670.0" prefWidth="1000.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="myproyect.pasziansz.Controller.Controller">
-   <children>
-      <ImageView fx:id="pakliView" fitHeight="182" fitWidth="125.0" layoutX="15.0" layoutY="15.0" onMouseClicked="#randomAction" pickOnBounds="true" preserveRatio="true" />
+<AnchorPane id="AnchorPane" prefHeight="400.0" prefWidth="600.0" xmlns:fx="http://javafx.com/fxml/1" fx:controller="myproyect.pasziansz.Controller.Controller">
+    <children>
+      <ImageView fx:id="pakliView" fitHeight="182" fitWidth="125.0" layoutX="15.0" layoutY="15.0" pickOnBounds="true" preserveRatio="true" />
       <ImageView fx:id="randomKartyaView" fitHeight="182" fitWidth="125.0" layoutX="150.0" layoutY="15.0" pickOnBounds="true" preserveRatio="true" />
       <ImageView fx:id="halom1View" fitHeight="182" fitWidth="125.0" layoutX="420.0" layoutY="15.0" pickOnBounds="true" preserveRatio="true" />
       <ImageView fx:id="halom2View" fitHeight="182" fitWidth="125.0" layoutX="555.0" layoutY="15.0" pickOnBounds="true" preserveRatio="true" />
