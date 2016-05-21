@@ -238,7 +238,7 @@ public class Controller implements Initializable {
             athelyezKartya(this.randomKartyIndex(), 2);
             return true;
         }catch(Exception e){
-            return false;
+            randomKartyaView.setImage(null);
         }
     }
     
