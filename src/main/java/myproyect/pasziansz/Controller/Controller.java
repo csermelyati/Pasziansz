@@ -109,6 +109,18 @@ public class Controller implements Initializable {
             refreshView();
         });
         
+        //kiinduló helyzet beállítása
+        int aktIndex;
+        for(int i = 0;i<7;i++){
+            for(int j = 0;j<i;j++){
+                aktIndex = this.randomKartyIndex();
+                this.athelyezKartya(aktIndex, i+7);
+                pakli.getKartyak().get(aktIndex).setVisible(false);
+            }
+            aktIndex = this.randomKartyIndex();
+                this.athelyezKartya(aktIndex, i+7);
+        }
+        
     }
     /**
      * Eldönti, hogy a kiválasztott kártyát át lehet e helyezni a kívánt helyre
@@ -154,8 +166,6 @@ public class Controller implements Initializable {
                 Integer max = pakli.getKartyak().stream()
                         .filter(w->w.getPlaceID().equals(akt.getPlaceID()))
                         .max((a1,a2)->a1.getStackNumber().compareTo(a2.getStackNumber())).get().getStackNumber();
-                System.out.println("cel: "+celMax.getNumValue()+", "+celMax.getType()+", "+" akt: "+akt.getNumValue()+", "+akt.getType());
-                System.out.println(akt.getStackNumber()+"?="+max);
                 return celMax.getNumValue().equals(akt.getNumValue()+1) && celMax.getType().equals(akt.getType()) && akt.getStackNumber().equals(max);
             }
             else return true;
@@ -237,6 +247,7 @@ public class Controller implements Initializable {
      * @return a kiválasztott kártya indexe
      */
     private int randomKartyIndex(){
+        
         List<Kartya> maradek = pakli.getKartyak().stream()
                 .filter(w->w.getPlaceID().equals(1))
                 .collect(Collectors.toList());
@@ -299,6 +310,7 @@ public class Controller implements Initializable {
             db.clear();
             
             if(oszlop.getBlendMode().equals(BlendMode.BLUE)){
+                this.setKovetkezoLathato(draggedIngex);
                 List<Kartya> indexek = pakli.getKartyak().stream()
                         .filter(w->w.getPlaceID().equals(pakli.getKartyak().get(draggedIngex).getPlaceID()) && (w.getStackNumber()>=pakli.getKartyak().get(draggedIngex).getStackNumber()))
                         .sorted((a1,a2)-> a1.getStackNumber().compareTo(a2.getStackNumber()))
@@ -341,6 +353,7 @@ public class Controller implements Initializable {
             db.clear();
             
             if(halom.getBlendMode().equals(BlendMode.BLUE)){
+                    this.setKovetkezoLathato(draggedIngex);
                     this.athelyezKartya(draggedIngex, i+3);
             }
             
@@ -424,5 +437,15 @@ public class Controller implements Initializable {
             lista.get(lista.size()-1).setVisible(true);
         }catch(Exception e){}
          
+    }
+    private boolean setKovetkezoLathato(int index){
+        try{
+            Kartya kovetkezo = pakli.getKartyak().stream()
+                    .filter(w->w.getPlaceID().equals(pakli.getKartyak().get(index).getPlaceID()) && w.getStackNumber().equals(pakli.getKartyak().get(index).getStackNumber()-1))
+                    .findFirst().get();
+            boolean eredeti = kovetkezo.isVisible();
+            kovetkezo.setVisible(true);
+            return eredeti;
+        }catch(Exception e){return true;}
     }
 }
