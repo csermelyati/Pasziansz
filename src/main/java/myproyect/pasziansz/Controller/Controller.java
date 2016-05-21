@@ -100,7 +100,9 @@ public class Controller implements Initializable {
         kartyaListeners(randomKartyaView);
         for(int i = 0;i<7;i++){
             oszlopListeners(osszOszlop[i], i);
-            if(i<4){}
+            if(i<4){
+                halomListeners(osszHalom[i], i);
+            }
         }
         pakliView.setOnMouseClicked(event->{
             this.csereKratya();
@@ -149,7 +151,12 @@ public class Controller implements Initializable {
             }
             //ha halom
             else if (hely > 2){
-                return celMax.getNumValue().equals(akt.getNumValue()+1) && celMax.getType().equals(akt.getType());
+                Integer max = pakli.getKartyak().stream()
+                        .filter(w->w.getPlaceID().equals(akt.getPlaceID()))
+                        .max((a1,a2)->a1.getStackNumber().compareTo(a2.getStackNumber())).get().getStackNumber();
+                System.out.println("cel: "+celMax.getNumValue()+", "+celMax.getType()+", "+" akt: "+akt.getNumValue()+", "+akt.getType());
+                System.out.println(akt.getStackNumber()+"?="+max);
+                return celMax.getNumValue().equals(akt.getNumValue()+1) && celMax.getType().equals(akt.getType()) && akt.getStackNumber().equals(max);
             }
             else return true;
         }catch(Exception e){
@@ -310,10 +317,46 @@ public class Controller implements Initializable {
         });
         
     }
+    private void halomListeners(ImageView halom, int i){
+        halom.setOnDragEntered((event)->{
+           if (this.athelyezHitelesites(draggedIngex, i+3))            
+                halom.setBlendMode(BlendMode.BLUE);
+            else halom.setBlendMode(BlendMode.GREEN);
+            event.consume();
+            
+        });
+        halom.setOnDragExited((event)->{
+            halom.setBlendMode(null);
+            
+            event.consume();
+        });
+        halom.setOnDragOver((event)->{
+            if (halom.getBlendMode().equals(BlendMode.BLUE))
+            event.acceptTransferModes(TransferMode.MOVE);
+            event.consume();
+            
+        });
+        halom.setOnDragDropped((event)->{
+            Dragboard db = event.getDragboard();
+            db.clear();
+            
+            if(halom.getBlendMode().equals(BlendMode.BLUE)){
+                    this.athelyezKartya(draggedIngex, i+3);
+            }
+            
+            event.setDropCompleted(true);
+            
+            event.consume();
+            
+        });
+    }
+    
+    
     private void refreshView(){
         //oszlopok frissítése
         for(int i=0;i<7;i++){
             osszOszlop[i].getChildren().clear();
+            //visszaRendezesOszlop(i);
             drawOszlop(i);
             if(i<4){
                 drawHalom(i);
@@ -366,5 +409,20 @@ public class Controller implements Initializable {
         }catch(Exception e){}
                     
                 
+    }
+    private void visszaRendezesOszlop(int i){
+        try{
+            
+            List<Kartya> lista= pakli.getKartyak().stream()
+                   .filter(w -> w.getPlaceID().equals(i+7))
+                   .sorted((a1, a2) -> Integer.compare(a1.getStackNumber(), a2.getStackNumber()))
+                   .collect(Collectors.toList());
+            int j;
+            for (j = 0; j< lista.size();j++){
+                lista.get(j).setStackNumber(j);
+            }
+            lista.get(lista.size()-1).setVisible(true);
+        }catch(Exception e){}
+         
     }
 }

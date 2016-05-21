@@ -17,21 +17,17 @@ import javafx.scene.image.Image;
  */
 public class Pakli {
     private List<Kartya> kartyak;
-    private Random rand;
-    private int currentRandom;
     private Image hatlap;
     
     public Pakli() {
         kartyak = new ArrayList<Kartya>();
-        rand = new Random();
         
         ResourceBundle nevek = ResourceBundle.getBundle("Cards.Cards");
-        for(int i = 1; i<=51;i++){
+        for(int i = 1; i<=52;i++){
             String name = nevek.getString(i+"");
             Kartya k = new Kartya(name,i);
             kartyak.add(k);
         }
-        currentRandom = -1;
         hatlap = new Image(Kartya.class.getResourceAsStream("/Cards/card_back.png"));
     }
 
@@ -39,12 +35,6 @@ public class Pakli {
         return kartyak;
     }
     
-    public int getCurrentRandom(){
-        return this.currentRandom;
-    }
-    public void setCurrentRandom(int i){
-        this.currentRandom = i;
-    }
     public Image getHatlap(){
         return hatlap;
     }

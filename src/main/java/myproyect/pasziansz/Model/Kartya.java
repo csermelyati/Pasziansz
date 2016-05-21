@@ -21,6 +21,7 @@ public class Kartya {
     
     
     public Kartya(String Name, int i){
+        System.out.println(Name+", "+i);
         this.index = i-1;
         this.visible = false;
         this.face = new Image(Kartya.class.getResourceAsStream("/Cards/"+Name+".png"));
