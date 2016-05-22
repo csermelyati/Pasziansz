@@ -18,7 +18,6 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import org.w3c.dom.*;
 import javax.xml.parsers.*;
 import java.io.*;
-import java.net.URISyntaxException;
 import java.time.LocalDateTime;
 import java.util.logging.Level;
 import java.util.logging.Logger;

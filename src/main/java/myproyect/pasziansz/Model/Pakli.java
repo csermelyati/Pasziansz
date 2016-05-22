@@ -17,8 +17,8 @@ import javafx.scene.image.Image;
  * @author csermely
  */
 public class Pakli {
-    public List<Kartya> kartyak;
-    public Image hatlap;
+    private List<Kartya> kartyak;
+    private Image hatlap;
     
     public Pakli() {
         kartyak = new ArrayList<Kartya>();
@@ -162,7 +162,7 @@ public class Pakli {
      * kiválaszt egy kártyát ami még a pakliban van
      * @return a kiválasztott kártya indexe
      */
-    public int randomKartyIndex() throws Exception{
+    public int randomKartyIndex(){
         List<Kartya> maradek = this.getKartyak().stream()
                 .filter(w->w.getPlaceID().equals(1))
                 .collect(Collectors.toList());
@@ -214,7 +214,6 @@ public class Pakli {
     /**
      * Eldönti, hogy a játék valóban véget ért e
      * 
-     * @param kartyaList az összes kártya listája
      * @return igaz, ha a játék véget ért, hamis ha még nem.
      */
     public boolean jatekVege(){

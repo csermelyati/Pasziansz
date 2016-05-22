@@ -78,7 +78,7 @@ public class PakliTest {
         int expResult1 = 7;
         boolean expResult2 = true;
         boolean result = instance.athelyezKartya(index, hely);
-        assertEquals((long)expResult1, (long)instance.kartyak.get(index).getPlaceID());
+        assertEquals((long)expResult1, (long)instance.getKartyak().get(index).getPlaceID());
         assertEquals(expResult2, result);
         
     }
@@ -91,7 +91,7 @@ public class PakliTest {
         boolean result = instance.csereKratya();
         assertEquals(expResult, result);
         
-        instance.kartyak.forEach(item->{
+        instance.getKartyak().forEach(item->{
             item.setPlaceID(7);
         });
         
@@ -106,14 +106,14 @@ public class PakliTest {
         System.out.println("visszaRendezesOszlop");
         int i = 7;
         Pakli instance = new Pakli();
-        instance.kartyak.get(1).setPlaceID(7);  //2_of_clubs
-        instance.kartyak.get(1).setStackNumber(0);
-        instance.kartyak.get(36).setPlaceID(7); //ace_of_hearts
-        instance.kartyak.get(36).setStackNumber(4);
+        instance.getKartyak().get(1).setPlaceID(7);  //2_of_clubs
+        instance.getKartyak().get(1).setStackNumber(0);
+        instance.getKartyak().get(36).setPlaceID(7); //ace_of_hearts
+        instance.getKartyak().get(36).setStackNumber(4);
         
         instance.visszaRendezesOszlop(i-7);
         
-        assertEquals(1, (long)instance.kartyak.get(36).getStackNumber());
+        assertEquals(1, (long)instance.getKartyak().get(36).getStackNumber());
         
     }
 
@@ -136,7 +136,7 @@ public class PakliTest {
         boolean result = instance.jatekVege();
         assertEquals(expResult, result);
         
-        instance.kartyak.forEach(item->{
+        instance.getKartyak().forEach(item->{
             item.setPlaceID(3);
         });
         
