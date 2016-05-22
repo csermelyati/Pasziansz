@@ -1,22 +1,22 @@
 package myproyect.pasziansz.Controller;
 
 import java.net.URL;
-import java.util.Collections;
 import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Optional;
 import java.util.Random;
 import java.util.ResourceBundle;
 import java.util.stream.Collectors;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.effect.BlendMode;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.Dragboard;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.AnchorPane;
+import javafx.stage.Stage;
 import myproyect.pasziansz.Model.Kartya;
 import myproyect.pasziansz.Model.Pakli;
 
@@ -111,7 +111,7 @@ public class Controller implements Initializable {
         });
         
         //kiinduló helyzet beállítása
-        try{
+       /* try{
             int aktIndex;
             for(int i = 0;i<7;i++){
                 for(int j = 0;j<i;j++){
@@ -123,6 +123,31 @@ public class Controller implements Initializable {
                     this.athelyezKartya(aktIndex, i+7);
             }
         }catch(Exception e){}
+        */
+       
+       //nyertes állapot előidézése
+       List<Kartya> rendezett = pakli.getKartyak().stream()
+               .sorted((a1,a2)->a2.getNumValue().compareTo(a1.getNumValue()))
+               .collect(Collectors.toList());
+       for (int i = 0;i<45;i++){
+           rendezett.get(i).setPlaceID(3);
+           rendezett.get(i).setStackNumber(13-rendezett.get(i).getNumValue());
+           rendezett.get(i).setVisible(true);
+           i++;
+           rendezett.get(i).setPlaceID(4);
+           rendezett.get(i).setStackNumber(13-rendezett.get(i).getNumValue());
+           rendezett.get(i).setVisible(true);
+           i++;
+           rendezett.get(i).setPlaceID(5);
+           rendezett.get(i).setStackNumber(13-rendezett.get(i).getNumValue());
+           rendezett.get(i).setVisible(true);
+           i++;
+           rendezett.get(i).setPlaceID(6);
+           rendezett.get(i).setStackNumber(13-rendezett.get(i).getNumValue());
+           rendezett.get(i).setVisible(true);
+           
+       }
+       
         
     }
     /**
@@ -384,7 +409,8 @@ public class Controller implements Initializable {
             try {
                 randomKartyaView.setImage(pakli.getKartyak().stream().filter(w->w.getPlaceID().equals(2)).findFirst().get().getFace());
             } catch (Exception e) {
-                System.out.println("myproyect.pasziansz.Controller.Controller2.refreshView() -.-.-.-.-.-.-.-.-.");
+                randomKartyaView.setImage(null);
+                this.jatekosNyert();
             }
                 
          
@@ -454,5 +480,24 @@ public class Controller implements Initializable {
             kovetkezo.setVisible(true);
             return eredeti;
         }catch(Exception e){return true;}
+    }
+    private void jatekosNyert()
+    {
+        FXMLLoader loader;
+        Stage stage;
+        Parent root = null;
+        
+        stage = (Stage)randomKartyaView.getScene().getWindow();
+        
+        loader = new FXMLLoader(getClass().getResource("/fxml/EndScene.fxml"));
+        try{
+        root=loader.load();
+        Scene scene = new Scene(root);
+        stage.setScene(scene);
+        
+        stage.show();
+        }catch(Exception e){
+            System.out.println("myproyect.pasziansz.Controller.Controller.jatekosNyert()");
+        }
     }
 }

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.text.*?>
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane id="AnchorPane" prefHeight="400.0" prefWidth="386.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="myproyect.pasziansz.Controller.EndController">
+   <children>
+      <Label layoutX="24.0" layoutY="23.0" text="Becenév:">
+         <font>
+            <Font size="14.0" />
+         </font>
+      </Label>
+      <TextField fx:id="becenevBox" layoutX="86.0" layoutY="18.0" prefHeight="30.0" prefWidth="230.0">
+         <font>
+            <Font size="14.0" />
+         </font>
+      </TextField>
+      <Button fx:id="okButton" layoutX="325.0" layoutY="18.0" mnemonicParsing="false" text="OK">
+         <font>
+            <Font size="14.0" />
+         </font>
+      </Button>
+      <TableView fx:id="table" layoutX="22.0" layoutY="70.0" prefHeight="316.0" prefWidth="342.0"/>
+   </children>
+</AnchorPane>
