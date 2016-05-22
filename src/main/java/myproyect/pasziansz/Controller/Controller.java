@@ -71,6 +71,7 @@ public class Controller implements Initializable {
      */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
+        System.out.println(url.toString());
         MainApp.startTime = LocalDateTime.now();
         //Modell inicializálása
         pakli = new Pakli();
@@ -97,7 +98,7 @@ public class Controller implements Initializable {
         halom3View.setImage(pakli.getHatlap());
         halom4View.setImage(pakli.getHatlap());
         try{
-            this.athelyezKartya(this.randomKartyIndex(), 2);
+            pakli.athelyezKartya(pakli.randomKartyIndex(), 2);
         }catch(Exception e){}
         
         //Listenerek beállítása
@@ -109,8 +110,12 @@ public class Controller implements Initializable {
             }
         }
         pakliView.setOnMouseClicked(event->{
-            this.csereKratya();
-            refreshView();
+            if (pakli.csereKratya())
+                refreshView();
+            else{
+                randomKartyaView.setImage(null);
+                refreshView();
+            }
         });
         
         //kiinduló helyzet beállítása
@@ -119,12 +124,12 @@ public class Controller implements Initializable {
             int aktIndex;
             for(int i = 0;i<7;i++){
                 for(int j = 0;j<i;j++){
-                    aktIndex = this.randomKartyIndex();
-                    this.athelyezKartya(aktIndex, i+7);
+                    aktIndex = pakli.randomKartyIndex();
+                    pakli.athelyezKartya(aktIndex, i+7);
                     pakli.getKartyak().get(aktIndex).setVisible(false);
                 }
-                aktIndex = this.randomKartyIndex();
-                    this.athelyezKartya(aktIndex, i+7);
+                aktIndex = pakli.randomKartyIndex();
+                    pakli.athelyezKartya(aktIndex, i+7);
             }
         }catch(Exception e){}
         */
@@ -153,146 +158,10 @@ public class Controller implements Initializable {
            
        }
       // */
-       this.csereKratya();
+       pakli.csereKratya();
        refreshView();
     }
-    /**
-     * Eldönti, hogy a kiválasztott kártyát át lehet e helyezni a kívánt helyre
-     * 
-     * 
-     * @param index a kártya indexe a pakliban
-     * @param hely a cél helyét jelölő index
-     * @return jelzi, hogy az áthelyezés sikeres volt e
-     */
-    public boolean athelyezHitelesites(int index, int hely){
-        Kartya akt = pakli.getKartyak().get(index);
-        try{
-            Kartya celMax = pakli.getKartyak().stream()
-                    .filter(w->w.getPlaceID().equals(hely))
-                    .max((a1,a2)->a1.getStackNumber().compareTo(a2.getStackNumber())).get();
-            
-            //ha oszlop
-            if(hely > 6){
-                boolean allowDrop = false;
-                if(celMax.getNumValue().equals(akt.getNumValue()+1))
-                    switch(celMax.getType()){
-                        case "diamonds":
-                                if(akt.getType().equals("clubs") || akt.getType().equals("spades"))
-                                    allowDrop = true;
-                            break;
-                        case "hearts":
-                                if(akt.getType().equals("clubs") || akt.getType().equals("spades"))
-                                    allowDrop = true;
-                            break;
-                        case "clubs":
-                                if(akt.getType().equals("diamonds") || akt.getType().equals("hearts"))
-                                    allowDrop = true;
-                            break;
-                        case "spades":
-                                if(akt.getType().equals("diamonds") || akt.getType().equals("hearts"))
-                                    allowDrop = true;
-                            break;
-                    }
-              return allowDrop;
-            }
-            //ha halom
-            else if (hely > 2){
-                Integer max = pakli.getKartyak().stream()
-                        .filter(w->w.getPlaceID().equals(akt.getPlaceID()))
-                        .max((a1,a2)->a1.getStackNumber().compareTo(a2.getStackNumber())).get().getStackNumber();
-                return celMax.getNumValue().equals(akt.getNumValue()+1) && celMax.getType().equals(akt.getType()) && akt.getStackNumber().equals(max);
-            }
-            else return true;
-        }catch(Exception e){
-            if(hely > 6){
-                return true;
-            }
-            else if(hely >2){
-                return akt.getValue().equals("king");
-            }
-            else return true;
-        }
-    }
     
-    
-    /**
-     * Ezzel a metódussal át tudunk helyezni egy kártyát egy másik helyre (oszlop, halom...)
-     * 
-     * 
-     * @param index a kártya indexe a pakliban
-     * @param hely a cél helyét jelölő index
-     * @return jelzi, hogy az áthelyezés sikeres volt e
-     */
-    public boolean athelyezKartya(int index, int hely){
-        try{
-            Kartya akt = pakli.getKartyak().get(index);
-            int stackNum;
-            try{
-                if(hely>2)
-                    stackNum = pakli.getKartyak().stream()
-                            .filter(w->w.getPlaceID().equals(hely))
-                            .max((a1,a2)->a1.getStackNumber().compareTo(a2.getStackNumber())).get().getStackNumber()+1;
-                else stackNum = 0;
-            }catch(Exception e){
-                stackNum = 0;
-
-            }
-            akt.setPlaceID(hely);
-            akt.setStackNumber(stackNum);
-            if(hely == 1){
-                akt.setVisible(false);
-            }
-            else akt.setVisible(true);
-            
-            return true;
-        }
-        catch(Exception e){
-            return false;
-        }
-    }
-    
-    /**
-     * Ha a felhasználó nem tud mit kezdeni a pakliból húzott lappal,
-     * akkor ez a függvény intézi el, hogy az a lap vissza kerüljön a pakliba,
-     * és egy másik kerüljön a helyére.
-     * 
-     * @return Ha a csere sikeres volt, akkor igaz, ha nem akkor hamis
-     */
-    public boolean csereKratya(){
-        try{
-            Kartya akt = pakli.getKartyak().stream()
-                    .filter(w->w.getPlaceID().equals(2))
-                    .findFirst().get();
-            akt.setPlaceID(1);
-            akt.setStackNumber(0);
-            akt.setVisible(false);
-        }catch(Exception e){}
-        
-        try{
-            athelyezKartya(this.randomKartyIndex(), 2);
-            return true;
-        }catch(Exception e){
-            randomKartyaView.setImage(null);
-            return false;
-        }
-    }
-    
-    /**
-     * kiválaszt egy kártyát ami még a pakliban van
-     * @return a kiválasztott kártya indexe
-     */
-    private int randomKartyIndex() throws Exception{
-        List<Kartya> maradek = pakli.getKartyak().stream()
-                .filter(w->w.getPlaceID().equals(1))
-                .collect(Collectors.toList());
-        Random r = new Random();
-        int i;
-        do{
-            i = r.nextInt(maradek.size());
-        }while (!maradek.get(i).getPlaceID().equals(1));
-        
-        return maradek.get(i).getIndex();
-    }
     /**
      * Beállítja a kártyák működéséhez szükséges Listenereket.
      * @param image A View.nak az aktuális kártyát reprezentáló eleme.
@@ -319,7 +188,7 @@ public class Controller implements Initializable {
         image.setOnDragDone((event)->{
             if(pakli.getKartyak().stream().filter(w->w.getPlaceID().equals(2)).count() == 0){
                 try{
-                this.athelyezKartya(this.randomKartyIndex(), 2);
+                pakli.athelyezKartya(pakli.randomKartyIndex(), 2);
                 }catch(Exception e){
                     
                 }
@@ -337,7 +206,7 @@ public class Controller implements Initializable {
      */
     private void oszlopListeners(AnchorPane oszlop, int i){
         oszlop.setOnDragEntered((event)->{
-            if (this.athelyezHitelesites(draggedIngex, i+7))            
+            if (pakli.athelyezHitelesites(draggedIngex, i+7))            
                 oszlop.setBlendMode(BlendMode.BLUE);
             else oszlop.setBlendMode(BlendMode.GREEN);
             event.consume();
@@ -357,14 +226,14 @@ public class Controller implements Initializable {
             db.clear();
             
             if(oszlop.getBlendMode().equals(BlendMode.BLUE)){
-                this.setKovetkezoLathato(draggedIngex);
+                pakli.setKovetkezoLathato(draggedIngex);
                 List<Kartya> indexek = pakli.getKartyak().stream()
                         .filter(w->w.getPlaceID().equals(pakli.getKartyak().get(draggedIngex).getPlaceID()) && (w.getStackNumber()>=pakli.getKartyak().get(draggedIngex).getStackNumber()))
                         .sorted((a1,a2)-> a1.getStackNumber().compareTo(a2.getStackNumber()))
                         .collect(Collectors.toList());
                 
                 indexek.forEach(item->{
-                    this.athelyezKartya(item.getIndex(), i+7);
+                    pakli.athelyezKartya(item.getIndex(), i+7);
                 });
                 
                 
@@ -384,7 +253,7 @@ public class Controller implements Initializable {
      */
     private void halomListeners(ImageView halom, int i){
         halom.setOnDragEntered((event)->{
-           if (this.athelyezHitelesites(draggedIngex, i+3))            
+           if (pakli.athelyezHitelesites(draggedIngex, i+3))            
                 halom.setBlendMode(BlendMode.BLUE);
             else halom.setBlendMode(BlendMode.GREEN);
             event.consume();
@@ -406,8 +275,8 @@ public class Controller implements Initializable {
             db.clear();
             
             if(halom.getBlendMode().equals(BlendMode.BLUE)){
-                    this.setKovetkezoLathato(draggedIngex);
-                    this.athelyezKartya(draggedIngex, i+3);
+                    pakli.setKovetkezoLathato(draggedIngex);
+                    pakli.athelyezKartya(draggedIngex, i+3);
             }
             
             event.setDropCompleted(true);
@@ -435,7 +304,7 @@ public class Controller implements Initializable {
                 randomKartyaView.setImage(null);
             }
         }
-        if(jatekVege(pakli.getKartyak())){
+        if(pakli.jatekVege()){
             this.jatekosNyert();
         }
         
@@ -489,43 +358,6 @@ public class Controller implements Initializable {
                     
                 
     }
-    
-    /**
-     * Megakadályozza, hogy az oszlopban lévő kártyák elcsússzanak
-     * @param i az oszlop sorszáma
-     */
-    private void visszaRendezesOszlop(int i){
-        try{
-            
-            List<Kartya> lista= pakli.getKartyak().stream()
-                   .filter(w -> w.getPlaceID().equals(i+7))
-                   .sorted((a1, a2) -> Integer.compare(a1.getStackNumber(), a2.getStackNumber()))
-                   .collect(Collectors.toList());
-            int j;
-            for (j = 0; j< lista.size();j++){
-                lista.get(j).setStackNumber(j);
-            }
-            lista.get(lista.size()-1).setVisible(true);
-        }catch(Exception e){}
-         
-    }
-    
-    /**
-     * Ha az oszlopban található kártya az aktuálisan mozgatotton kívül
-     * akkor azok közül a legfelsőt láthatóvá teszi
-     * @param index a mozgatott kártya indexe
-     * @return ha az alatta lévő lap látható akkor igaz, ha nem akkor hamis
-     */
-    public boolean setKovetkezoLathato(int index){
-        try{
-            Kartya kovetkezo = pakli.getKartyak().stream()
-                    .filter(w->w.getPlaceID().equals(pakli.getKartyak().get(index).getPlaceID()) && w.getStackNumber().equals(pakli.getKartyak().get(index).getStackNumber()-1))
-                    .findFirst().get();
-            boolean eredeti = kovetkezo.isVisible();
-            kovetkezo.setVisible(true);
-            return eredeti;
-        }catch(Exception e){return true;}
-    }
     /**
      * Ha a játékos meg tudta nyerni a játékot, akkor ez a metódus irányítja át
      * egy másik scene-re.
@@ -548,19 +380,8 @@ public class Controller implements Initializable {
         }catch(Exception e){
         }
     }
-    /**
-     * Eldönti, hogy a játék valóban véget ért e
-     * 
-     * @param kartyaList az összes kártya listája
-     * @return igaz, ha a játék véget ért, hamis ha még nem.
-     */
-    public boolean jatekVege(List<Kartya> kartyaList){
-        for(Kartya item : kartyaList){
-            if (item.getPlaceID() > 6 || item.getPlaceID() < 3)
-                return false;
-        }
-        return true;
-    }
+    
+    
     
     
 }

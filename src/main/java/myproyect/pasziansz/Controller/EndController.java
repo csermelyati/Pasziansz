@@ -86,7 +86,7 @@ public class EndController implements Initializable {
                 Document doc = null;
             
             try {
-                doc = dBuilder.parse(new File(System.getProperty("user.home")+"\\.highscore.xml"));
+                doc = dBuilder.parse(new File(System.getProperty("user.home")+File.separator+".highscore.xml"));
             } catch (SAXException ex) {}
             catch (IOException ex) {return returnList;}
             
@@ -134,7 +134,7 @@ public class EndController implements Initializable {
 		Transformer transformer = transformerFactory.newTransformer();
 		DOMSource source = new DOMSource(doc);
 		StreamResult result = null;
-                File outFile = new File(System.getProperty("user.home")+"\\.highscore.xml");
+                File outFile = new File(System.getProperty("user.home")+File.separator+".highscore.xml");
                 if(!outFile.exists()){
                     outFile.createNewFile();
                 }
