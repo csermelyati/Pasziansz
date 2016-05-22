@@ -8,7 +8,7 @@ package myproyect.pasziansz.Model;
 import javafx.scene.image.Image;
 
 /**
- *
+ * images from http://opengameart.org/content/playing-cards-vector-png
  * @author csermely
  */
 public class Kartya {
@@ -21,7 +21,6 @@ public class Kartya {
     
     
     public Kartya(String Name, int i){
-        System.out.println(Name+", "+i);
         this.index = i-1;
         this.visible = false;
         this.face = new Image(Kartya.class.getResourceAsStream("/Cards/"+Name+".png"));

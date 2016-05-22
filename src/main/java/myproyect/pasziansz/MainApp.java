@@ -11,8 +11,8 @@ import javafx.stage.Stage;
 
 public class MainApp extends Application {
 
-    public LocalDateTime startTime;
-    public LocalDateTime endTime;
+    public static LocalDateTime startTime;
+    public static LocalDateTime endTime;
     
     @Override
     public void start(Stage stage) throws Exception {

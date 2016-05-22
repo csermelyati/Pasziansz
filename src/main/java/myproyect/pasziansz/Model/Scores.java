@@ -15,30 +15,31 @@ import javafx.beans.property.StringProperty;
  * @author csermely
  */
 public class Scores {
-    private StringProperty name;
+    private String name;
     private LocalDateTime start;
     private LocalDateTime end;
-    private StringProperty minutes;
+    private String minutes;
     
     public Scores(String n, LocalDateTime s, LocalDateTime e){
-        this.name.set(n);
+        this.name = n;
         this.start = s;
         this.end = e;
+        this.minutes = ""+elteltPercek(s,e);
         //calc minutes
     }
     public Scores(String n,String m){
-        this.name.set(n);
-        this.minutes.set(m);
+        this.name = n;
+        this.minutes = m;
     }
-    public long elteltPercek(){
-        return LocalDateTime.from(start).until(end, ChronoUnit.MINUTES);
+    public Integer elteltPercek(LocalDateTime s, LocalDateTime e){
+        return (int)LocalDateTime.from(s).until(e, ChronoUnit.MINUTES);
     }
 
     public String getName() {
-        return name.get();
+        return name;
     }
     public String getMinutes() {
-        return minutes.get();
+        return minutes;
     }
 
     public LocalDateTime getStart() {
@@ -50,10 +51,10 @@ public class Scores {
     }
 
     public void setName(String name) {
-        this.name.set(name);
+        this.name = name;
     }
     public void setMinutes(String min) {
-        this.minutes.set(min);
+        this.minutes = min;
     }
 
     public void setStart(LocalDateTime start) {
@@ -63,16 +64,6 @@ public class Scores {
     public void setEnd(LocalDateTime end) {
         this.end = end;
     }
-    
-    public StringProperty nameProperty() { 
-         if (name == null) name = new SimpleStringProperty(this, "name");
-         return name; 
-     }
-    public StringProperty minutesProperty() { 
-         if (minutes == null) minutes = new SimpleStringProperty(this, "minutes");
-         return minutes; 
-     }
-    
     
     
 }
