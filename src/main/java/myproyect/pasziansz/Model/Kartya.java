@@ -8,7 +8,7 @@ package myproyect.pasziansz.Model;
 import javafx.scene.image.Image;
 
 /**
- * images from http://opengameart.org/content/playing-cards-vector-png
+ * A képeket innen töltöttem le: http://opengameart.org/content/playing-cards-vector-png
  * @author csermely
  */
 public class Kartya {

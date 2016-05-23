@@ -21,8 +21,17 @@ import javafx.stage.Stage;
 import myproyect.pasziansz.MainApp;
 import myproyect.pasziansz.Model.Kartya;
 import myproyect.pasziansz.Model.Pakli;
+import org.slf4j.*;
 
+/**
+ * Ez a játék Controllere
+ * Ez köti össze a Model-t a View-val
+ * 
+ * @author csermely
+ */
 public class Controller implements Initializable {
+    
+    static Logger LOGGER = LoggerFactory.getLogger(Controller.class);
 
     Pakli pakli; // a modell
     
@@ -113,13 +122,14 @@ public class Controller implements Initializable {
             if (pakli.csereKratya())
                 refreshView();
             else{
+                LOGGER.info("Nincs több lap a pakliban.");
                 randomKartyaView.setImage(null);
                 refreshView();
             }
         });
         
         //kiinduló helyzet beállítása
-        /*
+        ///*
         try{
             int aktIndex;
             for(int i = 0;i<7;i++){
@@ -132,10 +142,10 @@ public class Controller implements Initializable {
                     pakli.athelyezKartya(aktIndex, i+7);
             }
         }catch(Exception e){}
-        */
+        //*/
        
        //nyertes állapot előidézése
-      // /*
+       /*
        List<Kartya> rendezett = pakli.getKartyak().stream()
                .sorted((a1,a2)->a2.getNumValue().compareTo(a1.getNumValue()))
                .collect(Collectors.toList());
@@ -157,7 +167,7 @@ public class Controller implements Initializable {
            rendezett.get(i).setVisible(true);
            
        }
-      // */
+       */
        pakli.csereKratya();
        refreshView();
     }
@@ -183,8 +193,10 @@ public class Controller implements Initializable {
                 dragBoard.setContent(content);
                 
                 event.consume();
-                   
+                
+            LOGGER.info("A(z) {} indexü kártya meg lett fogva.",draggedIngex);
         });
+        
         image.setOnDragDone((event)->{
             if(pakli.getKartyak().stream().filter(w->w.getPlaceID().equals(2)).count() == 0){
                 try{
@@ -236,7 +248,7 @@ public class Controller implements Initializable {
                     pakli.athelyezKartya(item.getIndex(), i+7);
                 });
                 
-                
+                LOGGER.info("Sikeres áthelyezés ide: {}. oszlop",i);
             }
             
             event.setDropCompleted(true);
@@ -277,6 +289,7 @@ public class Controller implements Initializable {
             if(halom.getBlendMode().equals(BlendMode.BLUE)){
                     pakli.setKovetkezoLathato(draggedIngex);
                     pakli.athelyezKartya(draggedIngex, i+3);
+                    LOGGER.info("Sikeres áthelyezés ide: {}. halom",i);
             }
             
             event.setDropCompleted(true);
@@ -378,6 +391,7 @@ public class Controller implements Initializable {
         
         stage.show();
         }catch(Exception e){
+            LOGGER.error("Sikertelen Scene váltás");
         }
     }
     

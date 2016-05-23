@@ -31,6 +31,7 @@ import javax.xml.transform.stream.StreamResult;
 import myproyect.pasziansz.MainApp;
 import myproyect.pasziansz.Model.Scores;
 import org.xml.sax.SAXException;
+import org.slf4j.*;
 
 /**
  * Itt kerül lementésre a felhasználó teljesítménye,
@@ -39,6 +40,8 @@ import org.xml.sax.SAXException;
  */
 public class EndController implements Initializable {
 
+    static org.slf4j.Logger LOGGER = LoggerFactory.getLogger(EndController.class);
+    
     @FXML
     private TextField becenevBox;
     @FXML
@@ -80,13 +83,14 @@ public class EndController implements Initializable {
             try {
                 dBuilder = dbFactory.newDocumentBuilder();
             } catch (ParserConfigurationException ex) {
-                Logger.getLogger(EndController.class.getName()).log(Level.SEVERE, null, ex);
+                LOGGER.error("Sikertelen létrehozás: DocumentBuilder");
+                
             }
                 Document doc = null;
             
             try {
                 doc = dBuilder.parse(new File(System.getProperty("user.home")+File.separator+".highscore.xml"));
-            } catch (SAXException ex) {}
+            } catch (SAXException ex) {LOGGER.error("SAX Exception");}
             catch (IOException ex) {return returnList;}
             
             doc.getDocumentElement().normalize();
@@ -142,14 +146,14 @@ public class EndController implements Initializable {
              
 		transformer.transform(source, result);
 
-
+                LOGGER.info("Top lista frissítve és mentve!");
 	  } catch (ParserConfigurationException pce) {
-		pce.printStackTrace();
+		LOGGER.error("Parser Configuration Exception");
 	  } catch (TransformerException tfe) {
-		tfe.printStackTrace();
+		LOGGER.error("Transformer Exception");
 	  }
           catch (IOException ioe) {
-		ioe.printStackTrace();
+		LOGGER.error("IO Exception");
 	  }
     }
     

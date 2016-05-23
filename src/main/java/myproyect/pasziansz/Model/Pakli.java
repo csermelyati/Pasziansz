@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
 import javafx.scene.image.Image;
 
 /**
- *
+ * Ez a játék Model osztálya.
  * @author csermely
  */
 public class Pakli {
@@ -22,14 +22,14 @@ public class Pakli {
     
     public Pakli() {
         kartyak = new ArrayList<Kartya>();
-        
+        hatlap = new Image(Kartya.class.getResourceAsStream("/Cards/card_back.png"));
         ResourceBundle nevek = ResourceBundle.getBundle("Cards.Cards");
         for(int i = 1; i<=52;i++){
             String name = nevek.getString(i+"");
             Kartya k = new Kartya(name,i);
             kartyak.add(k);
         }
-        hatlap = new Image(Kartya.class.getResourceAsStream("/Cards/card_back.png"));
+        
     }
 
     public List<Kartya> getKartyak() {
@@ -41,9 +41,7 @@ public class Pakli {
     }
     
     /**
-     * Eldönti, hogy a kiválasztott kártyát át lehet e helyezni a kívánt helyre
-     * 
-     * 
+     * Eldönti, hogy a kiválasztott kártyát át lehet e helyezni a kívánt helyre.
      * @param index a kártya indexe a pakliban
      * @param hely a cél helyét jelölő index
      * @return jelzi, hogy az áthelyezés sikeres volt e
