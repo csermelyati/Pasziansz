@@ -24,8 +24,8 @@ import myproyect.pasziansz.Model.Pakli;
 import org.slf4j.*;
 
 /**
- * Ez a játék Controllere
- * Ez köti össze a Model-t a View-val
+ * Ez a játék Controllere.
+ * Ez köti össze a Model-t a View-val.
  * 
  * @author csermely
  */

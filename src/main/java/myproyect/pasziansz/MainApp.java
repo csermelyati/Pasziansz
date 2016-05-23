@@ -1,3 +1,4 @@
+
 package myproyect.pasziansz;
 
 import java.time.LocalDateTime;
@@ -8,7 +9,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
-
+//CHECKSTYLE:OFF
 public class MainApp extends Application {
 
     public static LocalDateTime startTime;

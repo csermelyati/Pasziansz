@@ -8,7 +8,8 @@ package myproyect.pasziansz.Model;
 import javafx.scene.image.Image;
 
 /**
- * A képeket innen töltöttem le: http://opengameart.org/content/playing-cards-vector-png
+ * Ez az osztály tárolja a Kártyák összes adatát.
+ * A képeket innen töltöttem le: http://opengameart.org/content/playing-cards-vector-png.
  * @author csermely
  */
 public class Kartya {
@@ -19,7 +20,7 @@ public class Kartya {
     private String value, type;
     private Integer numValue;
     
-    
+    //CHECKSTYLE:OFF
     public Kartya(String Name, int i){
         this.index = i-1;
         this.visible = false;
@@ -108,5 +109,5 @@ public class Kartya {
         this.visible = visible;
     }
     
-    
+    //CHECKSTYLE:ON
 }

@@ -11,7 +11,7 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
 /**
- * Ez az osztály a játékosok nevét és játékidejét hivatott tárolni
+ * Ez az osztály a játékosok nevét és játékidejét hivatott tárolni.
  * @author csermely
  */
 public class Scores {
@@ -19,7 +19,7 @@ public class Scores {
     private LocalDateTime start;
     private LocalDateTime end;
     private String minutes;
-    
+    //CHECKSTYLE:OFF
     public Scores(String n, LocalDateTime s, LocalDateTime e){
         this.name = n;
         this.start = s;
@@ -31,10 +31,17 @@ public class Scores {
         this.name = n;
         this.minutes = m;
     }
+    //CHECKSTYLE:ON
+    /**
+     * Ez a metódus adja meg, hogy hány perc telt el a játék kezdete és vége közt.
+     * @param s Játék kezdeti időpontja.
+     * @param e Játék végének időpontja.
+     * @return Akezdet és vég közt eltelt idő percekben.
+     */
     public Integer elteltPercek(LocalDateTime s, LocalDateTime e){
         return (int)LocalDateTime.from(s).until(e, ChronoUnit.MINUTES);
     }
-
+//CHECKSTYLE:OFF
     public String getName() {
         return name;
     }
