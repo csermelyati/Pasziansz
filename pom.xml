@@ -184,7 +184,7 @@
                         <configuration>
                             <archive>
                                 <manifest>
-                                    <mainClass>MainApp</mainClass>
+                                    <mainClass>myproyect.pasziansz.MainApp</mainClass>
                                 </manifest>
                             </archive>
                             <descriptorRefs>
